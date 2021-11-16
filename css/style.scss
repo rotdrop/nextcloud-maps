@@ -808,6 +808,9 @@ tr.selected td {
 }
 .searchCompleteLink {
     line-height: 35px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 .searchCompleteIcon i {
     min-height: 0px;
