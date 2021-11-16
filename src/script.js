@@ -1621,13 +1621,9 @@ import addressFormatter from '@fragaria/address-formatter';
                     iconElem = '<i class="far fa-dot-circle"></i>';
                 }
                 // shorten label if needed
-                var label = item.label;
-                if (label.length > 35) {
-                    label = label.substring(0, 35) + '…';
-                }
-                var listItem = $('<li></li>')
+                var listItem = $('<li title="' + item.label + '"></li>')
                     .data('item.autocomplete', item)
-                    .append('<a class="searchCompleteLink"><button class="searchCompleteIcon ' + iconClass + '">' + iconElem + '</button> ' + label + '</a>')
+                    .append('<a class="searchCompleteLink"><button class="searchCompleteIcon ' + iconClass + '">' + iconElem + '</button> ' + item.label + '</a>')
                     .appendTo(ul);
                 return listItem;
             };
