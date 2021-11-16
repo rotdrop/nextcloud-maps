@@ -1512,6 +1512,7 @@ import { brify, getUrlParameter, formatAddress } from './utils';
             data.push(...this.getExtraAutocompleteData(field));
             that.currentLocalAutocompleteData = data;
             fieldElement.autocomplete({
+                minLength: 0,
                 source: data,
                 select: function (e, ui) {
                     var it = ui.item;
@@ -1550,6 +1551,7 @@ import { brify, getUrlParameter, formatAddress } from './utils';
                             var lng = position.coords.longitude;
                             if (field === that.SEARCH_BAR) {
                                 that.map.setView([lat, lng], 15);
+                                $('#search-term').val('');
                             }
                             if (field === that.SEARCH_BAR || field === that.ROUTING_TO) {
                                 routingController.setRouteTo(L.latLng(lat, lng));
@@ -1583,7 +1585,7 @@ import { brify, getUrlParameter, formatAddress } from './utils';
                         $('.leaflet-routing-geocoder input').last().focus();
                     }
                 }
-            }).data('ui-autocomplete')._renderItem = function(ul, item) {
+            }).autocomplete('instance')._renderItem = function(ul, item) {
                 var iconClass = 'icon-link';
                 var iconElem = '';
                 if (item.type === 'favorite') {
@@ -1649,7 +1651,6 @@ import { brify, getUrlParameter, formatAddress } from './utils';
             }
             else {
                 var newData = [];
-                newData.push(...that.currentLocalAutocompleteData);
                 for (var i=0; i < results.length; i++) {
                     if (isCoordinateSearch && !results[i].maps_type) {
                         const label = results[i].display_name + ' (' + searchString + ')'
@@ -1681,8 +1682,10 @@ import { brify, getUrlParameter, formatAddress } from './utils';
                         });
                     }
                 }
+                // newData.push(...that.currentLocalAutocompleteData);
                 $('#search-term').autocomplete('option', {source: newData});
-                $('#search-term').autocomplete('search');
+                $('#search-term').autocomplete('option', {minLength: 0});
+                $('#search-term').autocomplete('search', '');
             }
         },
 
