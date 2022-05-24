@@ -39,6 +39,8 @@
 #        "build": "node node_modules/gulp-cli/bin/gulp.js"
 #    },
 
+export CXXFLAGS = -O3  -march=native -std=c++17
+
 app_name=$(notdir $(CURDIR))
 build_tools_directory=$(CURDIR)/build/tools
 source_build_directory=$(CURDIR)/build/artifacts/source
@@ -92,7 +94,7 @@ endif
 # Installs npm dependencies
 .PHONY: npm
 npm:
-	$(npm) ci
+	$(npm) ci --legacy-peer-deps
 	$(npm) run build
 
 .PHONY: npm-dev
