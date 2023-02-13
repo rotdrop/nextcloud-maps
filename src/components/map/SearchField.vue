@@ -70,6 +70,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		initialQuery: {
+			type: String,
+			default: '',
+		},
 	},
 
 	data() {
@@ -131,6 +135,10 @@ export default {
 				input.value = this.mySelectedOption.value || this.mySelectedOption.label
 			}
 		})
+		if (this.initialQuery !== '') {
+			this.onSearchChange(this.initialQuery)
+			this.onOptionSelected(this.currentSearchQueryOption)
+		}
 	},
 
 	methods: {
@@ -216,7 +224,11 @@ export default {
 						rawResult: r,
 					}
 				})
-				this.$refs.select.$el.querySelector('input').focus()
+				if (Array.isArray(this.currentOsmResults) && this.currentOsmResults.length === 1) {
+					this.onOptionSelected(this.currentOsmResults[0])
+				} else {
+					this.$refs.select.$el.querySelector('input').focus()
+				}
 			}).catch((error) => {
 				console.error(error)
 			}).then(() => {

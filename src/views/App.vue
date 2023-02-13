@@ -108,6 +108,7 @@
 					:active-layer-id-prop="activeLayerId"
 					:map-bounds-prop="mapBounds"
 					:search-data="searchData"
+					:initial-query="initialQuery"
 					:routing-search-data="routingSearchData"
 					:favorites="displayedFavorites"
 					:favorite-categories="favoriteCategories"
@@ -233,6 +234,7 @@ import { geoToLatLng, getFormattedADR } from '../utils/mapUtils.js'
 import * as network from '../network.js'
 import { all as axiosAll, spread as axiosSpread } from 'axios'
 import { generateUrl } from '@nextcloud/router'
+import { loadState } from '@nextcloud/initial-state'
 
 export default {
 	name: 'App',
@@ -255,6 +257,7 @@ export default {
 
 	data() {
 		return {
+		    initialQuery: '',
 		    // Map Options
 		    activeLayerId: optionsController.tileLayer,
 			mapBounds: optionsController.bounds,
@@ -650,6 +653,11 @@ export default {
 		// subscribe('nextcloud:unified-search.search', this.filter)
 		// subscribe('nextcloud:unified-search.reset', this.cleanSearch)
 		setTimeout(() => { emit('files:sidebar:closed') }, 1000)
+		try {
+			this.initialQuery = loadState('maps', 'search')
+		} catch (err) {
+			console.error('Unable to load initial query', err)
+		}
 	},
 	beforeDestroy() {
 		// unsubscribe('nextcloud:unified-search.search', this.filter)

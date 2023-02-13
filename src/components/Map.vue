@@ -28,6 +28,7 @@
 				:search-data="searchData"
 				:loading="searching"
 				:result-poi-number="searchPois.length"
+				:initial-query="initialQuery"
 				@validate="onSearchValidate"
 				@routing-clicked="showRouting = true"
 				@clear-pois="searchPois = []" />
@@ -377,6 +378,10 @@ export default {
 		lastCanceledActions: {
 			type: Array,
 			required: true,
+		},
+		initialQuery: {
+			type: String,
+			default: '',
 		},
 	},
 
