@@ -5,6 +5,7 @@
 				class="search-field"
 				:data="searchData"
 				:loading="loading"
+				:initial-query="initialQuery"
 				@validate="$emit('validate', $event)" />
 			<button
 				v-tooltip="{ content: t('maps', 'Find directions') }"
@@ -46,7 +47,8 @@ export default {
 		searchData: { type: Array, required: true },
 		loading: { type: Boolean, default: false },
 		resultPoiNumber: { type: Number, default: 0 },
-		position: { type: String, default: 'topleft' }
+		position: { type: String, default: 'topleft' },
+		initialQuery: { type: String, default: '', },
 	},
 
 	data() {
