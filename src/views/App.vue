@@ -35,7 +35,7 @@
 					@toggle-all-categories="onToggleAllFavoriteCategories"
 					@export="onExportFavorites"
 					@import="onImportFavorites"
-					@draggable-clicked="favoritesDraggable = !favoritesDraggable" 
+					@draggable-clicked="favoritesDraggable = !favoritesDraggable"
 				/>
 				<AppNavigationContactsItem
 					:enabled="contactsEnabled"
@@ -62,7 +62,7 @@
 					@redo-clicked="redoPhotoMove"
 					@draggable-clicked="photosDraggable = !photosDraggable"
 					@suggestions-clicked="onPhotoSuggestionsClicked"
-					@clear-cache="onPhotosClearCache" 
+					@clear-cache="onPhotosClearCache"
 				/>
 				<AppNavigationTracksItem
 					ref="tracksNavigation"
@@ -94,7 +94,7 @@
 					@toggle-all="onToggleAllDevices"
 					@color="onChangeDeviceColor"
 					@device-clicked="onNavDeviceClicked"
-					@devices-clicked="onDevicesClicked" 
+					@devices-clicked="onDevicesClicked"
 				/>
 				<AppNavigationMyMapsItem
 					v-if="!token"
@@ -108,7 +108,7 @@
 					@share="onShareMyMap"
 					@color="onChangeMyMapColor"
 					@my-map-clicked="onMyMapClicked"
-					@my-maps-clicked="onMyMapsClicked" 
+					@my-maps-clicked="onMyMapsClicked"
 				/>
 			</template>
 		</MapsNavigation>
@@ -119,6 +119,7 @@
 					:active-layer-id-prop="activeLayerId"
 					:map-bounds-prop="mapBounds"
 					:search-data="searchData"
+					:initial-query="initialQuery"
 					:routing-search-data="routingSearchData"
 					:favorites="displayedFavorites"
 					:favorite-categories="favoriteCategories"
@@ -245,6 +246,7 @@ import { all as axiosAll, spread as axiosSpread } from 'axios'
 import { generateUrl } from '@nextcloud/router'
 import { placeFileOrFolder } from '../utils/photoPicker.ts'
 import { getClient } from '@nextcloud/files/dav'
+import { loadState } from '@nextcloud/initial-state'
 
 export default {
 	name: 'App',
@@ -269,8 +271,9 @@ export default {
 		return {
 			// navigation
 			activeTab: null,
-		    // Map Options
-		    activeLayerId: optionsController.tileLayer,
+			initialQuery: '',
+			// Map Options
+			activeLayerId: optionsController.tileLayer,
 			mapBounds: optionsController.bounds,
 			optionValues: optionsController.optionValues,
 			sendPositionTimer: null,
@@ -664,6 +667,11 @@ export default {
 		// subscribe('nextcloud:unified-search.search', this.filter)
 		// subscribe('nextcloud:unified-search.reset', this.cleanSearch)
 		setTimeout(() => { emit('files:sidebar:closed') }, 1000)
+		try {
+			this.initialQuery = loadState('maps', 'search')
+		} catch (err) {
+			console.error('Unable to load initial query', err)
+		}
 	},
 	beforeUnmount() {
 		// unsubscribe('nextcloud:unified-search.search', this.filter)

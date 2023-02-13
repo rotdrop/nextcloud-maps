@@ -18,6 +18,7 @@
 					:search-data="searchData"
 					:loading="searching"
 					:result-poi-number="searchPois.length"
+					:initial-query="initialQuery"
 					@validate="onSearchValidate"
 					@routing-clicked="showRouting = true"
 					@clear-pois="searchPois = []" />
@@ -223,6 +224,7 @@ export default {
 		state: { type: String, default: '' },
 		lastActions: { type: Array, required: true },
 		lastCanceledActions: { type: Array, required: true },
+		initialQuery: { type: String, default: '', },
 	},
 	data() {
 		return {
