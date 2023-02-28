@@ -136,6 +136,7 @@ class PublicPageController extends AuthPublicShareController {
         $params = [];
 		$params['sharingToken'] = $this->getToken();
         $this->initialStateService->provideInitialState($this->appName, 'photos', $this->config->getAppValue('photos', 'enabled', 'no') === 'yes');
+        $this->initialStateService->provideInitialState($this->appName, 'search', $this->request->getParam('search') ?? '');
         $response = new PublicTemplateResponse('maps', 'public/main', $params);
 
         $this->addCsp($response);
