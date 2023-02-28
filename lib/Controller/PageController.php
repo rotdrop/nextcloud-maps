@@ -88,7 +88,7 @@ class PageController extends Controller {
 
 		$params = ['user' => $userId];
 		$this->initialState->provideInitialState('photos', $this->appConfig->getValueBool('photos', 'enabled'));
-		$this->initialState->provideInitialState('search', $this->request->getParam('search'));
+		$this->initialState->provideInitialState('search', $this->request->getParam('search') ?? '');
 		$response = new TemplateResponse('maps', 'main', $params);
 
 		$this->addCsp($response);
