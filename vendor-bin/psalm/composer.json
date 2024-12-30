@@ -3,7 +3,7 @@
         "psalm/phar": "^5.26",
         "nextcloud/ocp": "dev-master",
         "doctrine/dbal": "^3.7.0",
-        "symfony/console": "^5.4.24",
+        "symfony/console": "*",
         "sabre/dav": "4.6.0"
     }
 }
