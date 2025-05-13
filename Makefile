@@ -69,7 +69,7 @@ endif
 .PHONY: dev
 dev:
 ifneq (,$(wildcard $(CURDIR)/composer.json))
-	make composer
+	make composer-dev
 endif
 ifneq (,$(wildcard $(CURDIR)/package.json))
 	make npm-dev
@@ -79,6 +79,20 @@ endif
 # a copy is fetched from the web
 .PHONY: composer
 composer:
+ifeq (, $(composer))
+	@echo "No composer command available, downloading a copy from the web"
+	mkdir -p $(build_tools_directory)
+	curl -sS https://getcomposer.org/installer | php
+	mv composer.phar $(build_tools_directory)
+	php $(build_tools_directory)/composer.phar install --prefer-dist --no-dev
+else
+	composer install --prefer-dist --no-dev
+endif
+
+# Installs and updates the composer dependencies. If composer is not installed
+# a copy is fetched from the web
+.PHONY: composer-dev
+composer-dev:
 ifeq (, $(composer))
 	@echo "No composer command available, downloading a copy from the web"
 	mkdir -p $(build_tools_directory)
