@@ -30,6 +30,9 @@ use OCP\IRequest;
 use OCP\ISession;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
+use OCP\Security\Events\GenerateSecurePasswordEvent;
+use OCP\Security\ISecureRandom;
+use OCP\Security\PasswordContext;
 use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Share\IManager as ShareManager;
 use OCP\Share\IShare;
@@ -195,5 +198,90 @@ class PublicPageController extends AuthPublicShareController {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Validate the identity token of a public share
+	 *
+	 * @param ?string $identityToken
+	 * @return bool
+	 */
+	protected function validateIdentity(?string $identityToken = null): bool {
+		if ($this->share->getShareType() !== IShare::TYPE_EMAIL) {
+			return false;
+		}
+
+		if ($identityToken === null || $this->share->getSharedWith() === null) {
+			return false;
+		}
+
+		return $identityToken === $this->share->getSharedWith();
+	}
+
+	/**
+	 * Generates a password for the share, respecting any password policy defined
+	 */
+	protected function generatePassword(): void {
+		$event = new GenerateSecurePasswordEvent(PasswordContext::SHARING);
+		$this->eventDispatcher->dispatchTyped($event);
+		$password = $event->getPassword() ?? $this->secureRandom->generate(20);
+
+		$this->share->setPassword($password);
+		$this->shareManager->updateShare($this->share);
+	}
+
+	/**
+	 * @param $response
+	 * @return void
+	 */
+	private function addCsp($response): void {
+		if (class_exists('OCP\AppFramework\Http\ContentSecurityPolicy')) {
+			$csp = new \OCP\AppFramework\Http\ContentSecurityPolicy();
+			// map tiles
+			$csp->addAllowedImageDomain('https://*.tile.openstreetmap.org');
+			$csp->addAllowedImageDomain('https://tile.openstreetmap.org');
+			$csp->addAllowedImageDomain('https://server.arcgisonline.com');
+			$csp->addAllowedImageDomain('https://*.cartocdn.com');
+			$csp->addAllowedImageDomain('https://*.opentopomap.org');
+			$csp->addAllowedImageDomain('https://*.cartocdn.com');
+			$csp->addAllowedImageDomain('https://*.ssl.fastly.net');
+			$csp->addAllowedImageDomain('https://*.openstreetmap.se');
+
+			// default routing engine
+			$csp->addAllowedConnectDomain('https://*.project-osrm.org');
+			$csp->addAllowedConnectDomain('https://api.mapbox.com');
+			$csp->addAllowedConnectDomain('https://events.mapbox.com');
+			$csp->addAllowedConnectDomain('https://graphhopper.com');
+
+			$csp->addAllowedChildSrcDomain('blob:');
+			$csp->addAllowedWorkerSrcDomain('blob:');
+			$csp->addAllowedScriptDomain('https://unpkg.com');
+			// allow connections to custom routing engines
+			$urlKeys = [
+				'osrmBikeURL',
+				'osrmCarURL',
+				'osrmFootURL',
+				'graphhopperURL'
+			];
+			foreach ($urlKeys as $key) {
+				$url = $this->config->getAppValue('maps', $key);
+				if ($url !== '') {
+					$scheme = parse_url($url, PHP_URL_SCHEME);
+					$host = parse_url($url, PHP_URL_HOST);
+					$port = parse_url($url, PHP_URL_PORT);
+					$cleanUrl = $scheme . '://' . $host;
+					if ($port && $port !== '') {
+						$cleanUrl .= ':' . $port;
+					}
+					$csp->addAllowedConnectDomain($cleanUrl);
+				}
+			}
+
+			// poi images
+			$csp->addAllowedImageDomain('https://nominatim.openstreetmap.org');
+			// search and geocoder
+			$csp->addAllowedConnectDomain('https://nominatim.openstreetmap.org');
+			$response->setContentSecurityPolicy($csp);
+		}
 	}
 }
