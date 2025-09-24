@@ -1023,6 +1023,12 @@ export default {
 				})
 			})
 			const geojson = GeoJSON.parse(data, { LineString: 'line' })
+			let pathName = window.location.pathname;
+			const re = /\/s\/\w+$/;
+			if (pathName.match(re)) {
+				pathName = pathName.replace(re, '');
+			}
+			const srcFolder = window.location.origin.concat(pathName, '/src/components/leaflet-elevation//');
 			const el = this.elevationControl ?? L.control.elevation({
 				position: 'bottomleft',
 				detached: false,
@@ -1037,7 +1043,7 @@ export default {
 				// time: true,
 				summary: 'line',
 				ruler: false,
-				srcFolder: window.location.origin.concat(window.location.pathname, 'src/components/leaflet-elevation//'),
+				srcFolder,
 			})
 			el.addTo(this.map)
 			el.addData(geojson)
