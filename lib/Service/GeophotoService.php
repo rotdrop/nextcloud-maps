@@ -125,14 +125,14 @@ class GeophotoService {
 					continue;
 				}
 				$file = array_shift($files);
-	
+
 				if ($file === null) {
 					continue;
 				}
 				$path = $userFolder->getRelativePath($file->getPath());
 				$isIgnored = false;
 				foreach ($ignoredPaths as $ignoredPath) {
-					if (str_starts_with($path, $ignoredPath)) {
+					if (str_starts_with($path, $ignoredPath . '/')) {
 						$isIgnored = true;
 						break;
 					}
@@ -219,7 +219,7 @@ class GeophotoService {
 			$path = $userFolder->getRelativePath($file->getPath());
 			$isIgnored = false;
 			foreach ($ignoredPaths as $ignoredPath) {
-				if (str_starts_with($path, $ignoredPath)) {
+				if (str_starts_with($path, $ignoredPath . '/')) {
 					$isIgnored = true;
 					break;
 				}
