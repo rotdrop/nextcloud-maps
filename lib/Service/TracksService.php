@@ -211,7 +211,7 @@ class TracksService {
 		$path = $userFolder->getRelativePath($file->getPath());
 		$isIgnored = false;
 		foreach ($ignoredPaths as $ignoredPath) {
-			if (str_starts_with((string)$path, (string)$ignoredPath)) {
+				if (str_starts_with((string)$path, (string)$ignoredPath . '/')) {
 				$isIgnored = true;
 				break;
 			}
