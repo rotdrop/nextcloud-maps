@@ -17,6 +17,7 @@ use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\Files\Folder;
 use OCP\Files\GenericFileException;
 use OCP\Files\InvalidPathException;
 use OCP\Files\IRootFolder;
@@ -113,17 +114,20 @@ class PublicUtilsController extends PublicPageController {
 		$permissions = $share->getPermissions();
 		$folder = $this->getShareNode();
 		$isCreatable = ($permissions & (1 << 2)) && $folder->isCreatable();
-
-		try {
-			$file = $folder->get('.index.maps');
-		} catch (NotFoundException) {
-			if ($isCreatable) {
-				$file = $folder->newFile('.index.maps', $content = '{}');
-			} else {
-				throw new NotFoundException();
+		if (!($folder instanceof Folder)) {
+			$file = null;
+		} else {
+			try {
+				$file = $folder->get('.index.maps');
+			} catch (NotFoundException $e) {
+				if ($isCreatable) {
+					$file = $folder->newFile('.index.maps', $content = '{}');
+				} else {
+					$file = null;
+				}
 			}
 		}
-		$isUpdateable = ($permissions & (1 << 1)) && $file->isUpdateable();
+		$isUpdateable = $file !== null && ($permissions & (1 << 1)) && $file->isUpdateable();
 		if (!$isUpdateable) {
 			throw new NotPermittedException();
 		}
@@ -156,16 +160,24 @@ class PublicUtilsController extends PublicPageController {
 		$permissions = $share->getPermissions();
 		$folder = $this->getShareNode();
 		$isCreatable = ($permissions & (1 << 2)) && $folder->isCreatable();
-		try {
-			$file = $folder->get('.index.maps');
-		} catch (NotFoundException) {
-			if ($isCreatable) {
-				$file = $folder->newFile('.index.maps', $content = '{}');
-			} else {
-				throw new NotFoundException();
+		if (!($folder instanceof Folder)) {
+			$file = null;
+		} else {
+			try {
+				$file = $folder->get('.index.maps');
+			} catch (NotFoundException $e) {
+				if ($isCreatable) {
+					$file = $folder->newFile('.index.maps', $content = '{}');
+				} else {
+					$file = null;
+				}
 			}
 		}
-		$ov = json_decode((string)$file->getContent(), true, 512);
+		if ($file === null) {
+			$ov = [];
+		} else {
+			$ov = json_decode($file->getContent(), true, 512);
+		}
 
 		// Maps content can be read mostly from the folder
 		$ov['isReadable'] = ($permissions & (1 << 0)) && $folder->isReadable();
