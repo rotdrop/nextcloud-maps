@@ -9,6 +9,7 @@ import { getCurrentUser } from '@nextcloud/auth'
 import moment from '@nextcloud/moment'
 import { showSuccess, showError } from '@nextcloud/dialogs'
 import { useIsMobile } from '@nextcloud/vue'
+import { DialogBuilder } from '@nextcloud/dialogs'
 
 import L from 'leaflet'
 import 'leaflet-control-geocoder/dist/Control.Geocoder.js'
@@ -481,24 +482,25 @@ export default {
 			if (this.control._selectedRoute?.coordinates
 				&& this.control._selectedRoute.coordinates.length > 0
 			) {
-				OC.dialogs.confirmDestructive(
-					'',
-					t('maps', 'Export as'),
-					{
-						type: OC.dialogs.YES_NO_BUTTONS,
-						confirm: t('maps', 'GPX track'),
-						confirmClasses: '',
-						cancel: t('maps', 'GPX route'),
-					},
-					(result) => {
-						if (result) {
-							this.exportRoute('track')
-						} else {
-							this.exportRoute('route')
-						}
-					},
-					true,
-				)
+				const dialogBuilder = new DialogBuilder(t('maps', 'Export as'))
+				const dialog = dialogBuilder
+					.setButtons([
+						{
+							label: t('maps', 'GPX track'),
+							callback: () => {
+								this.exportRoute('track')
+							},
+							variant: 'primary',
+						},
+						{
+							label: t('maps', 'GPX route'),
+							callback: () => {
+								this.exportRoute('route')
+							},
+						},
+					])
+					.build()
+				dialog.show()
 			}
 		},
 		exportRoute(type = 'route') {
