@@ -14,6 +14,7 @@
 				class="search-field"
 				:data="searchData"
 				:loading="loading"
+				:initial-query="initialQuery"
 				@validate="emit('validate', $event)"
 				@clear="emit('clear')" />
 			<NcButton class="maps-search-control__directions"
@@ -38,10 +39,12 @@ import SearchField from './SearchField.vue'
 
 withDefaults(defineProps<{
 	visible?: boolean
-	searchData: unknown[]
+    searchData: unknown[]
+	initialQuery?: string
 	loading?: boolean
 }>(), {
 	visible: true,
+	initialQuery: '',
 	loading: false,
 })
 
