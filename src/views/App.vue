@@ -60,7 +60,7 @@
 					@toggle-all-categories="onToggleAllFavoriteCategories"
 					@export="onExportFavorites"
 					@import="onImportFavorites"
-					@draggable-clicked="favoritesDraggable = !favoritesDraggable" 
+					@draggable-clicked="favoritesDraggable = !favoritesDraggable"
 				/>
 				<AppNavigationContactsItem
 					:enabled="contactsEnabled"
@@ -87,7 +87,7 @@
 					@redo-clicked="redoPhotoMove"
 					@draggable-clicked="photosDraggable = !photosDraggable"
 					@suggestions-clicked="onPhotoSuggestionsClicked"
-					@clear-cache="onPhotosClearCache" 
+					@clear-cache="onPhotosClearCache"
 				/>
 				<AppNavigationTracksItem
 					ref="tracksNavigation"
@@ -119,7 +119,7 @@
 					@toggle-all="onToggleAllDevices"
 					@color="onChangeDeviceColor"
 					@device-clicked="onNavDeviceClicked"
-					@devices-clicked="onDevicesClicked" 
+					@devices-clicked="onDevicesClicked"
 				/>
 			</template>
 		</MapsNavigation>
@@ -130,6 +130,7 @@
 					:active-layer-id-prop="activeLayerId"
 					:map-bounds-prop="mapBounds"
 					:search-data="searchData"
+                    :initial-query="initialQuery"
 					:routing-search-data="routingSearchData"
 					:favorites="displayedFavorites"
 					:favorite-categories="favoriteCategories"
@@ -256,6 +257,7 @@ import { generateUrl } from '@nextcloud/router'
 import { placeFileOrFolder } from '../utils/photoPicker.ts'
 import { openFileInSidebar } from '../utils/filesSidebar.ts'
 import { getClient } from '@nextcloud/files/dav'
+import { loadState } from '@nextcloud/initial-state'
 
 export default {
 	name: 'App',
@@ -283,6 +285,7 @@ export default {
 		return {
 			// navigation
 			activeTab: null,
+			initialQuery: '',
 		    // Map Options
 		    activeLayerId: optionsController.tileLayer,
 			mapBounds: optionsController.bounds,
@@ -680,6 +683,11 @@ export default {
 		// subscribe('nextcloud:unified-search.search', this.filter)
 		// subscribe('nextcloud:unified-search.reset', this.cleanSearch)
 		// mounting the app replaced the files sidebar the server rendered into #content
+		try {
+            this.initialQuery = loadState('maps', 'search')
+        } catch (err) {
+            console.error('Unable to load initial query', err)
+        }
 		getSidebar().mount(this.$el)
 	},
 	beforeUnmount() {

@@ -81,6 +81,7 @@
 			<SearchControl :visible="!showRouting"
 				:search-data="searchData"
 				:loading="searching"
+				:initial-query="initialQuery"
 				@validate="onSearchValidate"
 				@clear="onSearchClear"
 				@routing-clicked="showRouting = true" />
@@ -241,6 +242,7 @@ const props = withDefaults(defineProps<{
 	lastCanceledActions?: HistoryAction[]
 	routingSearchData?: unknown[]
 	searchData?: unknown[]
+	initialQuery?: string
 }>(), {
 	mapBoundsProp: () => [],
 	activeLayerIdProp: '',
@@ -273,6 +275,7 @@ const props = withDefaults(defineProps<{
 	lastCanceledActions: () => [],
 	routingSearchData: () => [],
 	searchData: () => [],
+	initialQuery: ''
 })
 
 const emit = defineEmits<{
